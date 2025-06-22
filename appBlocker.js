@@ -2,30 +2,28 @@
 // This script counts down from 10, asks a question, then opens Facebook Messenger
 
 async function main() {
-    // Create and configure the alert for countdown
-    let countdownAlert = new Alert();
-    countdownAlert.title = "Countdown Timer";
-    
     // Countdown from 10 to 1
     for (let i = 10; i >= 1; i--) {
+        // Create a new alert for each number
+        let countdownAlert = new Alert();
+        countdownAlert.title = "Countdown Timer";
         countdownAlert.message = `${i}`;
+        countdownAlert.addAction("Continue");
         countdownAlert.addAction("Cancel");
         
         // Show the countdown number
         let countdownResult = await countdownAlert.presentAlert();
         
         // If user cancels, exit the script
-        if (countdownResult === 0) {
+        if (countdownResult === 1) {
             console.log("Countdown cancelled by user");
             return;
         }
         
-        // Wait for 1 second before next number
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Clear actions for next iteration
-        countdownAlert = new Alert();
-        countdownAlert.title = "Countdown Timer";
+        // Wait for 1 second before next number (except for the last one)
+        if (i > 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
     }
     
     // Show "Time's up!" message
