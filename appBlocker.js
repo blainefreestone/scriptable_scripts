@@ -2,36 +2,63 @@
 // This script counts down from 10, asks a question, then opens Facebook Messenger
 
 async function main() {
-    // Countdown from 10 to 1
-    for (let i = 10; i >= 1; i--) {
-        // Create a new alert for each number
-        let countdownAlert = new Alert();
-        countdownAlert.title = "Countdown Timer";
-        countdownAlert.message = `${i}`;
-        countdownAlert.addAction("Continue");
-        countdownAlert.addAction("Cancel");
-        
-        // Show the countdown number
-        let countdownResult = await countdownAlert.presentAlert();
-        
-        // If user cancels, exit the script
-        if (countdownResult === 1) {
-            console.log("Countdown cancelled by user");
-            return;
-        }
-        
-        // Wait for 1 second before next number (except for the last one)
-        if (i > 1) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+    // Show initial countdown start message
+    let startAlert = new Alert();
+    startAlert.title = "Countdown Timer";
+    startAlert.message = "Ready to start countdown from 10?";
+    startAlert.addAction("Start");
+    startAlert.addAction("Cancel");
+    
+    let startResult = await startAlert.presentAlert();
+    if (startResult === 1) {
+        console.log("Countdown cancelled by user");
+        return;
     }
     
-    // Show "Time's up!" message
-    let timeUpAlert = new Alert();
-    timeUpAlert.title = "Time's Up!";
-    timeUpAlert.message = "⏰ Countdown finished!";
-    timeUpAlert.addAction("Continue");
-    await timeUpAlert.presentAlert();
+    // Use notifications for the countdown since alerts don't update well
+    let notification = new Notification();
+    notification.title = "Countdown Timer";
+    
+    // Countdown from 10 to 1
+    for (let i = 10; i >= 1; i--) {
+        console.log(`Countdown: ${i}`);
+        
+        // Update notification
+        notification.body = `${i}`;
+        notification.sound = "default";
+        await notification.schedule();
+        
+        // Also show in a quick alert that dismisses automatically
+        let countAlert = new Alert();
+        countAlert.title = "Countdown";
+        countAlert.message = `${i}`;
+        
+        // Show alert briefly - don't wait for user input on intermediate numbers
+        if (i === 1) {
+            // On the last number, wait for user acknowledgment
+            countAlert.addAction("Time's Up!");
+            await countAlert.presentAlert();
+        } else {
+            // For other numbers, just show briefly
+            countAlert.addAction("Continue");
+            setTimeout(async () => {
+                // Auto-continue after showing the number
+            }, 100);
+        }
+        
+        // Wait 1 second between numbers
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    // Clear any pending notifications
+    await Notification.removeAllPending();
+    
+    // Show completion message
+    let completeAlert = new Alert();
+    completeAlert.title = "Time's Up!";
+    completeAlert.message = "⏰ Countdown finished!";
+    completeAlert.addAction("Continue");
+    await completeAlert.presentAlert();
     
     // Ask the question
     let questionAlert = new Alert();
@@ -46,7 +73,6 @@ async function main() {
     
     // Process the answer
     let answers = ["Great!", "Good", "Okay", "Not so good"];
-    let selectedAnswer = answers[questionResult];
     
     // Show response based on answer
     let responseAlert = new Alert();
@@ -74,16 +100,20 @@ async function main() {
     try {
         // Try the Facebook Messenger URL scheme first
         let messengerURL = "fb-messenger://";
-        let canOpenMessenger = await Safari.openInApp(messengerURL, false);
+        Safari.open(messengerURL);
         
-        if (!canOpenMessenger) {
-            // If Messenger app isn't installed, try the web version
-            console.log("Messenger app not found, opening web version");
-            await Safari.open("https://www.messenger.com");
-        }
+        // Small delay then fallback to web if needed
+        setTimeout(async () => {
+            try {
+                await Safari.open("https://www.messenger.com");
+            } catch (e) {
+                console.log("Opened Messenger successfully");
+            }
+        }, 2000);
+        
     } catch (error) {
         // Fallback to web version if there's any error
-        console.log("Error opening Messenger app, using web version: " + error);
+        console.log("Opening web version: " + error);
         await Safari.open("https://www.messenger.com");
     }
     
