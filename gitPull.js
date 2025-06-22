@@ -43,10 +43,10 @@ async function updateScript(scriptId) {
     const path = fm.joinPath(fm.documentsDirectory(), scriptDisplayName);
     fm.writeString(path, code);
 
-    console.log(`✅ Updated: ${scriptDisplayName}`);
+    console.log(`✅ Pulled: ${scriptDisplayName}`);
     return { scriptId, updated: true, message: `✅ ${scriptDisplayName}` };
   } catch (err) {
-    console.error(`❌ Failed to update ${scriptId}:`, err);
+    console.error(`❌ Failed to pull ${scriptId}:`, err);
     return { scriptId, updated: false, message: `❌ ${scriptId}.js — ${err.message}` };
   }
 }
@@ -65,7 +65,7 @@ async function updateAll() {
   }
 
   const alert = new Alert();
-  alert.title = "Update Complete";
+  alert.title = "Git Pull Complete";
   alert.message = results.join("\n");
   alert.addAction("OK");
   await alert.present();
