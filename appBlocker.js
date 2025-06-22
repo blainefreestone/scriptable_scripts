@@ -46,5 +46,8 @@ let result = await wv.present(true);
 
 // Check if the user pressed the button
 if (result === "open=true") {
-  Safari.open("fb-messenger://");
+  let shortcutName = encodeURIComponent("Messenger");
+  let url = `shortcuts://run-shortcut?name=${shortcutName}`;
+  // Open the Messenger shortcut
+  Safari.open(url);
 }
