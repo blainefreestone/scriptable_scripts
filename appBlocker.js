@@ -49,5 +49,5 @@ if (result === "open=true") {
   let shortcutName = encodeURIComponent("Messenger");
   let url = `shortcuts://run-shortcut?name=${shortcutName}`;
   // Open the Messenger shortcut
-  Safari.open(url);
+  Scriptable.open(url);
 }
