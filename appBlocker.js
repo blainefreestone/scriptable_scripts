@@ -1,4 +1,3 @@
-// HTML content for full-screen button
 let html = `
 <!DOCTYPE html>
 <html>
@@ -29,22 +28,22 @@ let html = `
   <button id="open">OK</button>
   <script>
     document.getElementById("open").onclick = () => {
-      // Send message to Scriptable to close the webview
-      window.location = "scriptable://close?open=true";
+      window.webkit.messageHandlers.scriptable.postMessage("open=true");
     }
   </script>
 </body>
 </html>
 `;
 
-// // Create a WebView and load the HTML
-// let wv = new WebView();
-// await wv.loadHTML(html);
+let wv = new WebView();
 
-// // Present the WebView full screen
-// let result = await wv.present(true);
+// Listen for messages from the webview
+wv.webView.configuration.userContentController.addScriptMessageHandler((msg) => {
+  if (msg === "open=true") {
+    Safari.open("fb-messenger://");
+    wv.close(); // Close the webview after action
+  }
+}, "scriptable");
 
-// // Check if the user pressed the button
-// if (result === "open=true") {
-  Safari.open("https://www.google.com");
-// }
+await wv.loadHTML(html);
+await wv.present(true);
