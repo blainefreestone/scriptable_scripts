@@ -39,7 +39,7 @@ async function updateScript(scriptId) {
     const data = Data.fromBase64String(base64);
     const code = data.toRawString();
 
-    const fm = FileManager.iCloud(); // or .local() if not using iCloud
+    const fm = FileManager.local(); // or .local() if not using iCloud
     const path = fm.joinPath(fm.documentsDirectory(), scriptDisplayName);
     fm.writeString(path, code);
 
