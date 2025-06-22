@@ -66,40 +66,22 @@ let html = `
     
     <script>
         function openMessenger() {
-            // Send message to Scriptable
-            window.webkit.messageHandlers.openMessenger.postMessage('open');
+            // Try to open Messenger directly
+            window.location.href = 'fb-messenger://';
+            
+            // Fallback: if Messenger isn't installed, open App Store after a delay
+            setTimeout(function() {
+                window.location.href = 'https://apps.apple.com/app/messenger/id454638411';
+            }, 1000);
         }
     </script>
 </body>
 </html>
 `
 
-// Load the HTML
+// Load the HTML and present the webview
 webview.loadHTML(html)
+await webview.present()
 
-// Handle the message from webview
-webview.evaluateJavaScript(`
-    window.webkit.messageHandlers.openMessenger = {
-        postMessage: function(message) {
-            completion(message);
-        }
-    };
-`, false).catch(e => console.log(e))
-
-// Present the webview
-let response = await webview.present()
-
-// When the okay button is clicked, open Facebook Messenger
-if (response === 'open') {
-    // Try to open Messenger app using URL scheme
-    let messengerURL = "fb-messenger://"
-    let canOpen = await Safari.openInApp(messengerURL, false)
-    
-    if (!canOpen) {
-        // If Messenger app isn't installed, open in App Store
-        let appStoreURL = "https://apps.apple.com/app/messenger/id454638411"
-        Safari.open(appStoreURL)
-    }
-}
-
+// Script completes when webview is dismissed
 Script.complete()
