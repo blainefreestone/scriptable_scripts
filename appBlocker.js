@@ -36,13 +36,16 @@ let html = `
 `;
 
 let wv = new WebView();
-
-wv.onURLChanged = (url) => {
-  if (url.includes("scriptable://action?open=true")) {
-    Safari.open("fb-messenger://");
-    wv.close();
-  }
-};
+const javascript = `
+  document.querySelector("button").addEventListener("click", () => {
+    window.location.href = "scriptable://action?open=true";
+  });
+`;
 
 await wv.loadHTML(html);
 await wv.present(true);
+let url = await wv.waitForURL("scriptable://action?open=true");
+if (url === "scriptable://action?open=true") {
+  // Handle the action when the button is clicked
+  console.log("Button clicked, proceeding with action.");
+}
