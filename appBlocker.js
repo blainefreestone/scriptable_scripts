@@ -37,14 +37,14 @@ let html = `
 </html>
 `;
 
-// Create a WebView and load the HTML
-let wv = new WebView();
-await wv.loadHTML(html);
+// // Create a WebView and load the HTML
+// let wv = new WebView();
+// await wv.loadHTML(html);
 
-// Present the WebView full screen
-let result = await wv.present(true);
+// // Present the WebView full screen
+// let result = await wv.present(true);
 
-// Check if the user pressed the button
-if (result === "open=true") {
-  app.open("audible://");
-}
+// // Check if the user pressed the button
+// if (result === "open=true") {
+  Safari.open("https://www.google.com");
+// }
