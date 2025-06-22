@@ -46,8 +46,5 @@ let result = await wv.present(true);
 
 // Check if the user pressed the button
 if (result === "open=true") {
-  let shortcutName = encodeURIComponent("Messenger");
-  let url = `shortcuts://run-shortcut?name=${shortcutName}`;
-  // Open the Messenger shortcut
-  Scriptable.open(url);
+  Safari.open("spotify://");
 }
