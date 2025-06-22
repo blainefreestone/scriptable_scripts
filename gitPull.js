@@ -1,6 +1,6 @@
 // gitPull.js — Self-updating Scriptable GitHub puller
 // Fetches .js files from GitHub and updates them in Scriptable
-// Relaunches itself if it was updated
+// Relaunches itself if it was updated, but skips rewriting unchanged files
 
 const OWNER = "blainefreestone";
 const REPO = "scriptable_scripts";
@@ -39,14 +39,25 @@ async function updateScript(scriptId) {
     const data = Data.fromBase64String(base64);
     const code = data.toRawString();
 
-    const fm = FileManager.local(); // or .local() if not using iCloud
+    const fm = FileManager.iCloud(); // or .local() if not using iCloud
     const path = fm.joinPath(fm.documentsDirectory(), scriptDisplayName);
+
+    // Skip writing if content is identical to preserve color
+    if (fm.fileExists(path)) {
+      const existing = fm.readString(path);
+      if (existing === code) {
+        console.log(`ℹ️ No changes for ${scriptDisplayName}, skipping write.`);
+        return { scriptId, updated: false, message: `ℹ️ ${scriptDisplayName} unchanged.` };
+      }
+    }
+
+    // Write updated code to file
     fm.writeString(path, code);
 
-    console.log(`✅ Pulled: ${scriptDisplayName}`);
+    console.log(`✅ Updated: ${scriptDisplayName}`);
     return { scriptId, updated: true, message: `✅ ${scriptDisplayName}` };
   } catch (err) {
-    console.error(`❌ Failed to pull ${scriptId}:`, err);
+    console.error(`❌ Failed to update ${scriptId}:`, err);
     return { scriptId, updated: false, message: `❌ ${scriptId}.js — ${err.message}` };
   }
 }
@@ -65,7 +76,7 @@ async function updateAll() {
   }
 
   const alert = new Alert();
-  alert.title = "Git Pull Complete";
+  alert.title = "Update Complete";
   alert.message = results.join("\n");
   alert.addAction("OK");
   await alert.present();
