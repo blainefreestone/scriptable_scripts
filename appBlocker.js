@@ -1,24 +1,19 @@
-let webview = new WebView();
-let html = `
-<!DOCTYPE html>
+let strHTMLOriginal = `<!DOCTYPE html>
 <html>
-<head>
-  <title>Button Example</title>
-</head>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
 <body>
-  <h1>Click the Button!</h1>
-  <button id="myButton">Click Me!</button>
-
-  <script>
-    document.getElementById("myButton").addEventListener("click", function() {
-      // JavaScript code to execute when the button is clicked
-      alert("Button clicked!"); // Example: Show an alert
-      // You can also call a function that communicates with Scriptable
-      // for more complex actions
-    });
-  </script>
+  <form>
+    <input id="field1" value="one" /><br>
+    <input id="field2" value="two" />
+  </form>
 </body>
-</html>
-`;
-await webview.loadHTML(html); // Load the HTML content
-webview.present(); // Present the WebView
+</html>`
+
+let viewOne = new WebView();
+await viewOne.loadHTML(strHTMLOriginal);
+await viewOne.present();
+
+console.log(await viewOne.evaluateJavaScript(`document.getElementById("field1").value`));
+console.log(await viewOne.evaluateJavaScript(`document.getElementById("field2").value`));
