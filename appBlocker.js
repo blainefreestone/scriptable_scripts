@@ -46,5 +46,5 @@ let result = await wv.present(true);
 
 // Check if the user pressed the button
 if (result === "open=true") {
-  Safari.open("audible://");
+  app.open("audible://");
 }
