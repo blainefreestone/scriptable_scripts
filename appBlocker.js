@@ -1,87 +1,23 @@
-// Create and present webview
-let webview = new WebView()
+// Create an alert with an "Okay" button
+let alert = new Alert()
+alert.title = "🗨️ Messenger"
+alert.message = "Ready to open Facebook Messenger?"
+alert.addAction("Okay")
+alert.addCancelAction("Cancel")
 
-// HTML content for the webview
-let html = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .container {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 300px;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-        p {
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        button {
-            background: #1877f2;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(24, 119, 242, 0.3);
-        }
-        button:hover {
-            background: #166fe5;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(24, 119, 242, 0.4);
-        }
-        button:active {
-            transform: translateY(0);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🗨️ Messenger</h1>
-        <p>Ready to open Facebook Messenger?</p>
-        <button onclick="openMessenger()">Okay</button>
-    </div>
+// Present the alert and wait for user response
+let response = await alert.presentAlert()
+
+// If user clicked "Okay" (index 0), open Messenger
+if (response === 0) {
+    // Try to open Messenger app using URL scheme
+    let messengerURL = "fb-messenger://"
+    let opened = Safari.openInApp(messengerURL, false)
     
-    <script>
-        function openMessenger() {
-            // Try to open Messenger directly
-            window.location.href = 'fb-messenger://';
-            
-            // Fallback: if Messenger isn't installed, open App Store after a delay
-            setTimeout(function() {
-                window.location.href = 'https://apps.apple.com/app/messenger/id454638411';
-            }, 1000);
-        }
-    </script>
-</body>
-</html>
-`
+    // If that doesn't work, try the web version
+    if (!opened) {
+        Safari.open("https://www.messenger.com")
+    }
+}
 
-// Load the HTML and present the webview
-webview.loadHTML(html)
-await webview.present()
-
-// Script completes when webview is dismissed
 Script.complete()
