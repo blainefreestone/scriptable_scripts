@@ -28,7 +28,7 @@ let html = `
   <button id="open">OK</button>
   <script>
     document.getElementById("open").onclick = () => {
-      window.webkit.messageHandlers.scriptable.postMessage("open=true");
+      window.scriptable.postMessage("open=true");
     }
   </script>
 </body>
@@ -36,14 +36,13 @@ let html = `
 `;
 
 let wv = new WebView();
-
-// Listen for messages from the webview
-wv.webView.configuration.userContentController.addScriptMessageHandler((msg) => {
-  if (msg === "open=true") {
-    Safari.open("fb-messenger://");
-    wv.close(); // Close the webview after action
-  }
-}, "scriptable");
-
 await wv.loadHTML(html);
-await wv.present(true);
+wv.present(true);
+
+// Wait for the message from the webview
+let msg = await wv.waitForMessage();
+
+if (msg === "open=true") {
+  Safari.open("fb-messenger://");
+  wv.close();
+}
